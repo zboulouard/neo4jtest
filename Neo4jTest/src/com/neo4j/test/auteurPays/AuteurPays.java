@@ -1,5 +1,8 @@
 package com.neo4j.test.auteurPays;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,59 +12,80 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.neo4j.test.auteurPays.labels.NodeLabels;
 import com.neo4j.test.auteurPays.labels.TypeRelation;
 
 public class AuteurPays {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		GraphDatabaseFactory dbFactory = new GraphDatabaseFactory();
 		GraphDatabaseService db = dbFactory.newEmbeddedDatabase("C:\\Zakaria\\NeoTests\\AuteurPays");
 		
+		Gson gson = new GsonBuilder()
+							        .disableHtmlEscaping()
+							        .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+							        .setPrettyPrinting()
+							        .serializeNulls()
+							        .create();
+		
+		Writer writer = new FileWriter("sources\\Output.json");
+		
+		List<Node> nodes = new ArrayList<Node>();
+		List<Relationship> links = new ArrayList<Relationship>();
+		
 		try (Transaction tx = db.beginTx()) {
 			
 			Node maroc = db.createNode(NodeLabels.PAYS);
-			maroc.setProperty("Name", "Maroc");
+			maroc.setProperty("name", "Maroc");
+			maroc.setProperty("group", 1); //couleur
 			
-			System.out.println("Pays : " + maroc.getProperty("Name") + " bien enregisté!");
+			nodes.add(maroc);
 			
 			Node france = db.createNode(NodeLabels.PAYS);
-			france.setProperty("Name", "France");
+			france.setProperty("name", "France");
+			france.setProperty("group", 1);
 			
-			System.out.println("Pays : " + france.getProperty("Name") + " bien enregisté!");
+			nodes.add(france);
 			
 			Node zakaria = db.createNode(NodeLabels.AUTEUR);
-			zakaria.setProperty("Nom", "BOULOUARD");
-			zakaria.setProperty("Prénom", "Zakaria");
+			zakaria.setProperty("name", "Zakaria");
+			zakaria.setProperty("group", 2);
 			
-			System.out.println("Auteur : "+ zakaria.getProperty("Nom") + " " + zakaria.getProperty("Prénom") + " bien enregisté!");
+			nodes.add(zakaria);
 			
 			Node bernard = db.createNode(NodeLabels.AUTEUR);
-			bernard.setProperty("Nom", "DOUSSET");
-			bernard.setProperty("Prénom", "Bernard");
+			bernard.setProperty("name", "Bernard");
+			bernard.setProperty("group", 2);
 			
-			System.out.println("Auteur : "+ bernard.getProperty("Nom") + " " + bernard.getProperty("Prénom") + " bien enregisté!");
+			nodes.add(bernard);
 			
 			Node anass = db.createNode(NodeLabels.AUTEUR);
-			anass.setProperty("Nom", "EL HADDADI");
-			anass.setProperty("Prénom", "Anass");
+			anass.setProperty("name", "Anass");
+			anass.setProperty("group", 2);
 			
-			System.out.println("Auteur : "+ anass.getProperty("Nom") + " " + anass.getProperty("Prénom") + " bien enregisté!");
+			nodes.add(anass);
 			
 			Relationship app1 = zakaria.createRelationshipTo(maroc, TypeRelation.APPARTENANCE);
+			app1.setProperty("source", zakaria.getId());
+			app1.setProperty("target", maroc.getId());
 			app1.setProperty("Oriented", true);
-			app1.setProperty("Weigtht", 1);
+			app1.setProperty("value", 1); //poids
 			app1.setProperty("Date", 1988);
 			
-			System.out.println("Date de naturalisation de " + zakaria.getProperty("Nom") + " " + zakaria.getProperty("Prénom") + " par le " + maroc.getProperty("Name") + " est en : " + app1.getProperty("Date"));
+			links.add(app1);
 			
 			Relationship coll1 = zakaria.createRelationshipTo(france, TypeRelation.COLLABORATION);
+			coll1.setProperty("source", zakaria.getId());
+			coll1.setProperty("target", france.getId());
 			coll1.setProperty("Oriented", false);
-			coll1.setProperty("Weight", 1);
+			coll1.setProperty("value", 1);
 			coll1.setProperty("Date", 2015);
 			
-			System.out.println("Date de collaboration de " + zakaria.getProperty("Nom") + " " + zakaria.getProperty("Prénom") + " avec la " + france.getProperty("Name") + " est en : " + coll1.getProperty("Date"));
+			links.add(coll1);
 			
 			List<Integer> l1 = new ArrayList<Integer>();
 			l1.add(2006);
@@ -69,11 +93,13 @@ public class AuteurPays {
 			l1.add(2015);
 			
 			Relationship coll2 = bernard.createRelationshipTo(maroc, TypeRelation.COLLABORATION);
+			coll1.setProperty("source", zakaria.getId());
+			coll1.setProperty("target", france.getId());
 			coll2.setProperty("Oriented", false);
-			coll2.setProperty("Weight", 3);
+			coll2.setProperty("value", 3);
 			coll2.setProperty("Date", l1.toString());
 			
-			System.out.println("Dates de collaboration de " + bernard.getProperty("Nom") + " " + bernard.getProperty("Prénom") + " avec le " + maroc.getProperty("Name") + " sont en : " + coll2.getProperty("Date"));
+			links.add(coll2);
 			
 			tx.success();
 			
