@@ -1,0 +1,47 @@
+{
+  "nodes": [
+    {
+      "name": "Maroc",
+      "group": 1
+    },
+    {
+      "name": "France",
+      "group": 1
+    },
+    {
+      "name": "Zakaria",
+      "group": 2
+    },
+    {
+      "name": "Bernard",
+      "group": 2
+    },
+    {
+      "name": "Anass",
+      "group": 2
+    }
+  ],
+  "links": [
+    {
+      "source": 2,
+      "target": 0,
+      "value": 1,
+      "oriented": true,
+      "date": "1988"
+    },
+    {
+      "source": 2,
+      "target": 1,
+      "value": 1,
+      "oriented": false,
+      "date": "2015"
+    },
+    {
+      "source": 3,
+      "target": 0,
+      "value": 3,
+      "oriented": false,
+      "date": "[2006, 2010, 2015]"
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 package com.neo4j.test.auteurPays;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +140,16 @@ public class AuteurPays {
 			
 			Graphe graphe = new Graphe(nodes, links);
 			String gsonGraphe = gson.toJson(graphe);
-			System.out.println(gsonGraphe);
+			File file = new File("src/com/neo4j/test/auteurPays/sources/Output.json");
+			//System.out.println(file.getAbsoluteFile());
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileWriter writer = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bufferedWriter = new BufferedWriter(writer);
+			bufferedWriter.write(gsonGraphe);
+			bufferedWriter.close();
+			//System.out.println(gsonGraphe);
 			
 			tx.success();
 			
